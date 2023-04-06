@@ -8,6 +8,10 @@ class Api extends React.Component {
     this._headers = this.props.headers;
   }
 
+  setHeaderToken(token) {
+    this._headers = { ...this._headers, Authorization: `Bearer ${token}` };
+  }
+
   _getResponseData(res) {
     if (!res.ok) {
       return Promise.reject(`Ошибка: ${res.status}`);

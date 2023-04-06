@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Register from './Register';
 import Login from './Login';
@@ -28,38 +28,51 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    tokenCheck()
-  }, [loggedIn])
+  const tokenCheck = useCallback(() => {
+    const jwt = localStorage.getItem('jwt')
+    api.setHeaderToken(jwt)
+    if (jwt !== null) auth.getContent(jwt)
+      .then((res) => {
+        setUserEmail(res.email)
+        setCurrentUser(res)
+        setLoggedIn(true)
+        navigate('/')
+      }).catch((err) => console.log(`Некорректный токен. ${err}`))
+  }, [navigate])
 
   useEffect(() => {
-    Promise.all([
-      api.getProfile(),
-      api.getInitialCards()
-    ])
-      .then(([userData, cardsData]) => {
-        setCurrentUser(userData);
+    tokenCheck()
+  }, [])
+
+  useEffect(() => {
+    if (loggedIn === true) {
+      Promise.all([
+        api.getInitialCards()
+      ]).then(([cardsData]) => {
         setCards(cardsData);
       }).catch((err) => console.log(`Данные не загрузились. ${err}`))
-  }, [])
+    }
+  }, [loggedIn])
 
   function handleEditProfileClick() { setIsEditProfilePopupOpen(true); }
   function handleEditAvatarClick() { setIsEditAvatarPopupOpen(true); }
   function handleAddPlaceClick() { setIsAddPlacePopupOpen(true); }
   function handleCardClick(card) { setSelectedCard(card); }
+
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.some(i => i === currentUser._id);
     api.changeLikeCardStatus(card._id, !isLiked)
       .then((newCard) => {
-        console.log(newCard);
         setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
       }).catch((err) => console.log(`С лайками какая-то проблема. ${err}`))
   }
+
   function handleCardDelete(card) {
     api.deleteCard(card._id).then(() => {
       setCards((state) => state.filter((c) => c._id !== card._id));
     }).catch((err) => console.log(`Карточка не удалилась. ${err}`))
   }
+
   function handleUpdateUser({ name, about }) {
     api.editProfile(name, about)
       .then((res) => {
@@ -67,18 +80,21 @@ function App() {
         closeAllPopups();
       }).catch(err => console.log(`Данные профиля не были обновлены. ${err}`))
   }
+
   function handleUpdateAvatar({ avatar }) {
     api.editAvatar(avatar).then((res) => {
       setCurrentUser(res);
       closeAllPopups();
     }).catch(err => console.log(`Не удалось обновить аватар. ${err}`))
   }
+
   function handleAddPlaceSubmit({ name, link }) {
     api.addCard(name, link).then((newCard) => {
       setCards([newCard, ...cards]);
       closeAllPopups();
     }).catch(err => console.log(`Карточка не добавилась. ${err}`))
   }
+
   function closeAllPopups() {
     setIsEditProfilePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
@@ -96,28 +112,20 @@ function App() {
   }
 
   function handleLogin({ email, password }) {
-    auth.login(email, password)
+    return auth.login(email, password)
       .then(res => {
         localStorage.setItem("jwt", res.token)
       }).then(() => {
+        tokenCheck()
         setLoggedIn(true)
       }).catch(err => console.log(`Не удаётся войти. ${err}`))
   }
-
-  function tokenCheck() {
-    const jwt = localStorage.getItem('jwt')
-    if (jwt) auth.getContent(jwt)
-      .then((res) => {
-        setLoggedIn(true)
-        setUserEmail(res.data.email)
-        navigate("/")
-      }).catch(navigate("/sign-in"))
-  }
-
+  
   function signOut() {
     localStorage.removeItem("jwt")
     setLoggedIn(false)
     setUserEmail('')
+    api.setHeaderToken(null)
     navigate("/sign-in")
   }
 
