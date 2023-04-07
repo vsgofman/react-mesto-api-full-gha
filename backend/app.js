@@ -18,9 +18,9 @@ const allowedCors = [
   'https://praktikum.tk',
   'http://praktikum.tk',
   'localhost:3000',
+  'https://vsgof.mesto.nomoredomains.monster',
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  /(https|http)?:\/\/(?:www\.|(?!www))vsgof.mesto.nomoredomains.monster\/[a-z]+\/|[a-z]+\/|[a-z]+(\/|)/,
 ];
 
 app.use((req, res, next) => {
