@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const UnauthorizedError = require('../errors/unauthorizedError');
 
+const { JWT_SECRET, NODE_ENV } = process.env;
+
 module.exports.auth = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -9,7 +11,7 @@ module.exports.auth = (req, res, next) => {
   const token = authorization.replace('Bearer ', '');
   let payload;
   try {
-    payload = jwt.verify(token, 'jwt');
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'jwt');
   } catch (err) {
     if (err.name === 'JsonWebTokenError') {
       throw new UnauthorizedError('Прислан некорректный токен');

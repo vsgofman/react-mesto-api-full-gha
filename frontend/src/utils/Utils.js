@@ -1,5 +1,5 @@
 const apiConfig = {
-  url: "http://localhost:3001",
+  url: "https://vsgof.mestoapi.nomoredomains.monster",
   headers: {
     'Content-Type': 'application/json'
   },
