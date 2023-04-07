@@ -1,6 +1,5 @@
 {
-  "name": "mesto-reac-auth",
-  "homepage": "https://vsgofman.github.io/react-mesto-auth",
+  "name": "mesto-react-auth",
   "version": "0.1.0",
   "repository": {
     "url": "git+https://github.com/vsgofman/react-mesto-auth.git"
