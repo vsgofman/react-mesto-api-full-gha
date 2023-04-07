@@ -19,7 +19,7 @@ const allowedCors = [
   'localhost:3000',
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  /(https|http)?:\/\/(?:www\.|(?!www))mesto.online.nomoredomains.work\/[a-z]+\/|[a-z]+\/|[a-z]+(\/|)/,
+  /(https|http)?:\/\/(?:www\.|(?!www))vsgof.mesto.nomoredomains.monster\/[a-z]+\/|[a-z]+\/|[a-z]+(\/|)/,
 ];
 
 app.use((req, res, next) => {
