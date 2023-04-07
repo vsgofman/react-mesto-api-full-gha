@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const { errors, Joi, celebrate } = require('celebrate');
+const cors = require('cors');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const { login, register } = require('./controllers/users');
@@ -12,34 +13,8 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundError = require('./errors/notFoundError');
 
 const app = express();
+app.use(cors());
 const { PORT = 3001 } = process.env;
-
-const allowedCors = [
-  'https://praktikum.tk',
-  'http://praktikum.tk',
-  'localhost:3000',
-  'https://vsgof.mesto.nomoredomains.monster',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-];
-
-app.use((req, res, next) => {
-  const { origin } = req.headers;
-  if (allowedCors.some((e) => e.test && e.test(origin)) || allowedCors.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Credentials', true);
-  }
-  const { method } = req;
-  const requestHeaders = req.headers['access-control-request-headers'];
-  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
-
-  if (method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
-    res.header('Access-Control-Allow-Headers', requestHeaders);
-    return res.end();
-  }
-  return next();
-});
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
