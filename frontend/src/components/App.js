@@ -20,7 +20,7 @@ function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
-  const [modalResponse, setModalResponse] = useState({ open: false, status: false });
+  const [modalResponse, setModalResponse] = useState({ open: false, status: false , message: '' });
   const [selectedCard, setSelectedCard] = useState({ name: '', link: '' });
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
@@ -100,15 +100,15 @@ function App() {
     setIsEditAvatarPopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setSelectedCard({ name: '', link: '' });
-    setModalResponse({ open: false, status: modalResponse.status });
+    setModalResponse({ open: false, status: modalResponse.status, message: modalResponse.message });
   }
 
   function handleRegister({ email, password }) {
     auth.register(email, password)
       .then((res) => {
-        setModalResponse({ open: true, status: true });
+        setModalResponse({ open: true, status: true, message: 'Вы успешно зарегистрировались!' });
         navigate("/sign-in");
-      }).catch(() => setModalResponse({ open: true, status: false }))
+      }).catch(() => setModalResponse({ open: true, status: false, message: 'Что-то пошло не так! Попробуйте ещё раз.' }))
   }
 
   function handleLogin({ email, password }) {
@@ -118,7 +118,10 @@ function App() {
       }).then(() => {
         tokenCheck()
         setLoggedIn(true)
-      }).catch(err => console.log(`Не удаётся войти. ${err}`))
+      }).catch(err => {
+        setModalResponse({ open: true, status: false, message: 'Не удаётся войти!' })
+        console.log(`Не удаётся войти. ${err}`)
+      })
   }
   
   function signOut() {

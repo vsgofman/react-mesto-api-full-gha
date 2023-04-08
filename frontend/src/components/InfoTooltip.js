@@ -11,9 +11,7 @@ function InfoToolTip({ modalResponse, onClose }) {
           src={modalResponse.status ? modalOkImg : modalErrorImg} 
         />
         <h2 className="modal__title">
-          {modalResponse.status
-            ? 'Вы успешно зарегистрировались!'
-            : 'Что-то пошло не так! Попробуйте ещё раз.'}
+          {modalResponse.message}
         </h2>
       </div>
     </div>
